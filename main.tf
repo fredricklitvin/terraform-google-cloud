@@ -11,3 +11,7 @@ terraform {
   }
 }
 
+module "name" {
+  source = "./modules/network"
+}
+
