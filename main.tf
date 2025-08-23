@@ -22,3 +22,7 @@ module "k8s" {
   secondary_ip_range_1 = module.network.private_subnet_ip_range_1
   secondary_ip_range_0 = module.network.private_subnet_ip_range_0
 }
+
+module "artifact" {
+source = "./modules/artifact"
+}
