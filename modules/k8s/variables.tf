@@ -14,3 +14,9 @@ variable "private_subnet_id" {
   description = "private subnet  id"
   type        = string
 }
+
+variable "project" {
+  description = "The GCP project being used"
+  type = string
+  sensitive   = true
+}

@@ -1,10 +1,30 @@
+resource "google_service_account" "gke_node_sa" {
+  account_id   = "gke-node-sa"
+  display_name = "GKE Node Service Account"
+}
+
 resource "google_container_cluster" "default" {
   name = "k8s"
 
-  location                 = "us-central1"
-  enable_autopilot         = true
-  enable_l4_ilb_subsetting = true
+  location = "us-central1"
+  
+  # Switch to a Standard cluster
+  enable_autopilot = false
+  
+  # This block is now valid for a Standard cluster
+  node_config {
+    service_account = google_service_account.gke_node_sa.email
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
 
+  initial_node_count = 1 # Start with a single node
+  
+  # The following arguments are not compatible with a standard cluster
+  # and should be removed if they are present:
+  # enable_l4_ilb_subsetting = true
+  deletion_protection = false
   network    = var.vpc_network_id
   subnetwork = var.private_subnet_id
 
@@ -13,6 +33,6 @@ resource "google_container_cluster" "default" {
     services_secondary_range_name = var.secondary_ip_range_1
     cluster_secondary_range_name  = var.secondary_ip_range_0
   }
-
-  deletion_protection = false
 }
+
+
