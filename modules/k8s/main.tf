@@ -2,6 +2,16 @@ resource "google_service_account" "gke_node_sa" {
   account_id   = "gke-node-sa"
   display_name = "GKE Node Service Account"
 }
+resource "google_project_iam_member" "artifact_registry_reader_role" {
+  project = var.project
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
+}
+resource "google_project_iam_member" "compute_storage_admin_role" {
+  project = var.project
+  role    = "roles/compute.storageAdmin"
+  member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
+}
 
 resource "google_container_cluster" "default" {
   name = "k8s"
@@ -35,4 +45,11 @@ resource "google_container_cluster" "default" {
   }
 }
 
+resource "google_compute_disk" "app_data_disk" {
+  name    = "app-data-disk"
+  project = var.project
+  zone    = "us-central1-a" 
+  size    = 10             
+  type    = "pd-standard"
+}
 

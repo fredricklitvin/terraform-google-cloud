@@ -1,11 +1,7 @@
 locals {
   suffix = "v9"
 }
-resource "google_artifact_registry_repository" "frontend" {
-  location      = "us-central1"
-  repository_id = "frontend"
-  format        = "DOCKER"
-}
+
 
 resource "google_artifact_registry_repository" "backend" {
   location      = "us-central1"
@@ -13,12 +9,6 @@ resource "google_artifact_registry_repository" "backend" {
   format        = "DOCKER"
 }
 
-resource "google_artifact_registry_repository" "database" {
-  location      = "us-central1"
-  repository_id = "database"
-  description   = "example docker repository"
-  format        = "DOCKER"
-}
 
 resource "google_service_account" "github_actions" {
   account_id   = "sgithub-actions-${local.suffix}"
