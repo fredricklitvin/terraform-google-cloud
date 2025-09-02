@@ -1,22 +1,22 @@
 resource "google_service_account" "gke_node_sa" {
-  account_id   = "gke-node-sa"
-  display_name = "GKE Node Service Account"
+  account_id   = var.service_account_id
+  display_name = var.service_account_display_name
 }
 resource "google_project_iam_member" "artifact_registry_reader_role" {
-  project = var.project
+  project = var.project_id
   role    = "roles/artifactregistry.reader"
   member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
 }
 resource "google_project_iam_member" "compute_storage_admin_role" {
-  project = var.project
+  project = var.project_id
   role    = "roles/compute.storageAdmin"
   member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
 }
 
 resource "google_container_cluster" "default" {
-  name = "k8s"
+  name = var.cluster_name
 
-  location = "us-central1"
+  location = var.region
   
   # Switch to a Standard cluster
   enable_autopilot = false
@@ -29,7 +29,7 @@ resource "google_container_cluster" "default" {
     ]
   }
 
-  initial_node_count = 1 # Start with a single node
+  initial_node_count = var.node_count # Start with a single node
   
   # The following arguments are not compatible with a standard cluster
   # and should be removed if they are present:
@@ -46,10 +46,9 @@ resource "google_container_cluster" "default" {
 }
 
 resource "google_compute_disk" "app_data_disk" {
-  name    = "app-data-disk"
-  project = var.project
-  zone    = "us-central1-a" 
-  size    = 10             
-  type    = "pd-standard"
+  name    = var.disk_name
+  project = var.project_id
+  zone    = var.disk_zone
+  size    = var.disk_size             
+  type    = var.disk_type
 }
-

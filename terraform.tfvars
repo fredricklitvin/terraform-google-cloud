@@ -14,3 +14,23 @@ private_subnet_name = "private-subnet"
 # The name of the public subnet.
 public_subnet_name = "public-subnet"
 
+#A unique suffix for resources to prevent naming conflict
+project_suffix = "v9"
+
+# artifact repository name for the backend
+artifact_repository_name = "backend"
+
+#github repository that will be allowed to push to the artifact storage
+github_repository = "fredricklitvin/k8s-project-helm"
+
+#service account with permission for the k8s
+service_account_id = "gke-node-sa"
+
+#the name displayed for the service account
+service_account_display_name = "GKE Node Service Account"
+
+#k8s cluster name
+cluster_name = "k8s"
+
+#the storage disk used by the cluster name 
+disk_name = "app-data-disk"
