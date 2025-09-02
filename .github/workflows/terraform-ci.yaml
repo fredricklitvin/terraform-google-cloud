@@ -26,7 +26,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           # Use your new Workload Identity Provider.
-          workload_identity_provider: 'principal://iam.googleapis.com/projects/225435158395/locations/global/workloadIdentityPools/terraform-github/subject/SUBJECT_ATTRIBUTE_VALUE'
+          workload_identity_provider: 'projects/225435158395/locations/global/workloadIdentityPools/terraform-github/providers/github'
           # Use your new service account.
           service_account: 'terraform-service-account@i-agility-465314-p6.iam.gserviceaccount.com'
 
