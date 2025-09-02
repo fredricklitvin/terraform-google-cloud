@@ -14,7 +14,7 @@ variable "region" {
 variable "project_suffix" {
   type        = string
   description = "A unique suffix for resources to prevent naming conflicts"
-  default     = "v9"
+  default     = "v10"
 }
 
 
@@ -28,4 +28,5 @@ variable "artifact_repository_name" {
 variable "github_repository" {
   type        = string
   description = "The GitHub repository in 'owner/repo' format"
+
 }

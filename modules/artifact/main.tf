@@ -60,7 +60,7 @@ resource "google_service_account_iam_policy" "github_iam_policy_binding" {
 
 # 3. Granting permissions to push to the registry
 resource "google_project_iam_member" "artifact_registry_writer" {
-  project = var.project_id
+  project = var.project
   role    = "roles/artifactregistry.writer"
   member  = "serviceAccount:${google_service_account.github_actions.email}"
 }

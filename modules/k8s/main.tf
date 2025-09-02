@@ -3,12 +3,12 @@ resource "google_service_account" "gke_node_sa" {
   display_name = var.service_account_display_name
 }
 resource "google_project_iam_member" "artifact_registry_reader_role" {
-  project = var.project_id
+  project = var.project
   role    = "roles/artifactregistry.reader"
   member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
 }
 resource "google_project_iam_member" "compute_storage_admin_role" {
-  project = var.project_id
+  project = var.project
   role    = "roles/compute.storageAdmin"
   member  = "serviceAccount:${google_service_account.gke_node_sa.email}"
 }
@@ -47,7 +47,7 @@ resource "google_container_cluster" "default" {
 
 resource "google_compute_disk" "app_data_disk" {
   name    = var.disk_name
-  project = var.project_id
+  project = var.project
   zone    = var.disk_zone
   size    = var.disk_size             
   type    = var.disk_type
