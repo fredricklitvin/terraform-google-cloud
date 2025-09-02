@@ -21,7 +21,7 @@ module "network" {
 
 module "k8s" {
   source = "./modules/k8s"
-  project = var.project
+  project = local.project_id
   vpc_network_id = module.network.vpc_network_id
   private_subnet_id = module.network.private_subnet_id
   secondary_ip_range_1 = module.network.private_subnet_ip_range_1
@@ -35,9 +35,9 @@ module "k8s" {
 
 module "artifact" {
   source = "./modules/artifact"
-  project = var.project
+  project = local.project_id
   project_suffix = var.project_suffix
   artifact_repository_name = var.artifact_repository_name
-  github_repository = var.github_repository
+  github_repository = local.github_repository
   region = var.region
 }

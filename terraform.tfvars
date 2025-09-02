@@ -1,6 +1,3 @@
-# The name of your GCP project.
-#project_id = "your-gcp-project-id"
-
 # The GCP region where resources will be created.
 region = "us-central1"
 
@@ -19,9 +16,6 @@ project_suffix = "v10"
 
 # artifact repository name for the backend
 artifact_repository_name = "backend"
-
-#github repository that will be allowed to push to the artifact storage
-github_repository = "fredricklitvin/k8s-project-helm"
 
 #service account with permission for the k8s
 service_account_id = "gke-node-sa"

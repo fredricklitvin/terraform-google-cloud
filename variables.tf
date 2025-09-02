@@ -44,10 +44,10 @@ variable "artifact_repository_name" {
 }
 
 
-variable "github_repository" {
-  type        = string
-  description = "The GitHub repository in 'owner/repo' format"
-}
+# variable "github_repository" {
+#   type        = string
+#   description = "The GitHub repository in 'owner/repo' format"
+# }
 
 #k8s module
 variable "service_account_id" {
