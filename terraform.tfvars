@@ -12,7 +12,7 @@ private_subnet_name = "private-subnet"
 public_subnet_name = "public-subnet"
 
 #A unique suffix for resources to prevent naming conflict
-project_suffix = "v12"
+project_suffix = "v13"
 
 # artifact repository name for the backend
 artifact_repository_name = "backend"
