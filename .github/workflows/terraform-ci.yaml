@@ -13,7 +13,8 @@ jobs:
   validate_and_plan:
     runs-on: ubuntu-latest
     name: 'Validate & Plan'
-    if: github.event_name == 'pull_request' or github.event_name == 'push'
+    # Use '||' for the logical OR operator
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     
     permissions:
       contents: read
