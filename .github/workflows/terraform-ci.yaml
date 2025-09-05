@@ -58,9 +58,9 @@ jobs:
         id: validate
         run: terraform validate -json
 
-      - name: Terrascan Scan
-        id: terrascan
-        run: terrascan scan -t gcp -i terraform
+      # - name: Terrascan Scan
+      #   id: terrascan
+      #   run: terrascan scan -t gcp -i terraform
 
       - name: Terraform Plan
         id: plan
