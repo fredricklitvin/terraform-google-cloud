@@ -1,43 +1,121 @@
-name: Terraform CI/CD
+name: 'Terraform CI/CD'
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
-
-env:
-  TF_VAR_project_id: i-agility-465314-p6
+  push:
+    branches:
+      - main
 
 jobs:
-  terraform:
+  # This job runs on every pull request to validate and plan changes.
+  validate_and_plan:
     runs-on: ubuntu-latest
+    name: 'Validate & Plan'
+    if: github.event_name == 'pull_request'
+    
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          # Use your new Workload Identity Provider.
-          workload_identity_provider: 'projects/225435158395/locations/global/workloadIdentityPools/terraform-github/providers/github'
-          # Use your new service account.
-          service_account: 'terraform-service-account@i-agility-465314-p6.iam.gserviceaccount.com'
-
+      
+      # Use a stable Terraform version.
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+      
+      # Install and run Terrascan for security and cost analysis.
+      - name: Install Terrascan
+        run: |
+          curl -L "https://github.com/accurics/terrascan/releases/download/v1.17.0/terrascan_1.17.0_Linux_x86_64.tar.gz" -o terrascan.tar.gz
+          tar -xvf terrascan.tar.gz terrascan
+          sudo install terrascan /usr/local/bin/
+      
+      # Use a Google Cloud Service Account for authentication.
+      # You need to configure this in your GitHub repo settings.
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/225435158395/locations/global/workloadIdentityPools/terraform-github/providers/github'
+          service_account: 'terraform-service-account@i-agility-465314-p6.iam.gserviceaccount.com'
 
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -json
+
+      - name: Terrascan Scan
+        id: terrascan
+        run: terrascan scan -t gcp -i terraform
+
       - name: Terraform Plan
-        run: terraform plan -input=false
+        id: plan
+        run: |
+          terraform plan -input=false -out=plan.tfplan
+      
+      # This step uploads the plan for the apply job to use later.
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: plan.tfplan
+          
+  # This job runs only on merges to main and requires manual approval.
+  apply:
+    runs-on: ubuntu-latest
+    name: 'Apply'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    # The magic happens here! This links the job to your protected environment.
+    environment:
+      name: production
+
+    needs: validate_and_plan
+    
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/225435158395/locations/global/workloadIdentityPools/terraform-github/providers/github'
+          service_account: 'terraform-service-account@i-agility-465314-p6.iam.gserviceaccount.com'
+      
+      - name: Terraform Init
+        run: terraform init
+
+      # This step downloads the plan file that was created in the `plan` job.
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: .
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve plan.tfplan
